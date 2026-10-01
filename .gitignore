@@ -1,0 +1,48 @@
+# ---------- Java / Maven ----------
+target/
+*.class
+*.jar
+!**/.mvn/wrapper/maven-wrapper.jar
+.mvn/
+!.mvn/wrapper/maven-wrapper.properties
+
+# ---------- Node ----------
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------- 环境变量与密钥 ----------
+# 绝不能提交：这里放着 Anthropic API Key 和 JWT 签名密钥
+.env
+.env.*
+!.env.example
+application-local.yml
+application-local.yaml
+
+# ---------- IDE ----------
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+*.swp
+*.swo
+*~
+
+# ---------- 操作系统 ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- 运行时产物 ----------
+logs/
+*.log
+uploads/

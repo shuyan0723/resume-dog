@@ -1,0 +1,68 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #f5f6f8;
+}
+
+/* 简历预览区：等宽呈现，模拟 A4 纸张的比例感 */
+.resume-paper {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+  padding: 32px 36px;
+  max-width: 794px; /* A4 @ 96dpi */
+  margin: 0 auto;
+}
+
+.resume-section {
+  margin-bottom: 22px;
+}
+
+.resume-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.resume-entry {
+  margin-bottom: 14px;
+}
+
+.resume-entry:last-child {
+  margin-bottom: 0;
+}
+
+.resume-entry-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.resume-entry-org {
+  font-weight: 600;
+}
+
+.resume-entry-period {
+  color: #6b7280;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.resume-entry-meta {
+  color: #6b7280;
+  font-size: 13px;
+  margin: 2px 0 4px;
+}

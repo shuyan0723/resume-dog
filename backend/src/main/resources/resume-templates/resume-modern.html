@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${title}">简历</title>
+    <style th:replace="~{resume-fragments :: base}"></style>
+    <style>
+        /* 现代强调色：只用一个主色做层级，其余保持克制 */
+        body {
+            color: #1f2933;
+        }
+
+        .header {
+            border-bottom: 3px solid #2f6fed;
+        }
+
+        .name {
+            color: #2f6fed;
+        }
+
+        .section-title {
+            color: #2f6fed;
+            border-bottom: 1px solid #d7e0f5;
+            padding-left: 8px;
+            border-left: 4px solid #2f6fed;
+        }
+
+        .org {
+            color: #102a43;
+        }
+
+        ul.highlights li:before {
+            color: #2f6fed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <div class="name" th:text="${content.basicInfo.name}">姓名</div>
+        <div class="target" th:text="${content.basicInfo.targetPosition}">求职意向</div>
+    </div>
+    <div class="header-right">
+        <div class="contact">
+            <div th:if="${!#strings.isEmpty(content.basicInfo.phone)}"
+                 th:text="${content.basicInfo.phone}">电话</div>
+            <div th:if="${!#strings.isEmpty(content.basicInfo.email)}"
+                 th:text="${content.basicInfo.email}">邮箱</div>
+            <div th:if="${!#strings.isEmpty(content.basicInfo.city)}"
+                 th:text="${content.basicInfo.city}">城市</div>
+            <div th:if="${!#strings.isEmpty(content.basicInfo.homepage)}"
+                 th:text="${content.basicInfo.homepage}">主页</div>
+        </div>
+    </div>
+</div>
+
+<div class="section" th:if="${!#strings.isEmpty(content.basicInfo.summary)}">
+    <div class="section-title">个人概述</div>
+    <div th:replace="~{resume-fragments :: summary(${content})}"></div>
+</div>
+
+<div class="section" th:if="${!#lists.isEmpty(content.education)}">
+    <div class="section-title">教育背景</div>
+    <div th:replace="~{resume-fragments :: education(${content.education})}"></div>
+</div>
+
+<div class="section" th:if="${!#lists.isEmpty(content.work)}">
+    <div class="section-title">工作经历</div>
+    <div th:replace="~{resume-fragments :: work(${content.work})}"></div>
+</div>
+
+<div class="section" th:if="${!#lists.isEmpty(content.projects)}">
+    <div class="section-title">项目经历</div>
+    <div th:replace="~{resume-fragments :: projects(${content.projects})}"></div>
+</div>
+
+<div class="section" th:if="${!#lists.isEmpty(content.skills)}">
+    <div class="section-title">专业技能</div>
+    <div th:replace="~{resume-fragments :: skills(${content.skills})}"></div>
+</div>
+
+<div class="section" th:if="${!#lists.isEmpty(content.honors)}">
+    <div class="section-title">荣誉奖项</div>
+    <div th:replace="~{resume-fragments :: honors(${content.honors})}"></div>
+</div>
+
+<div class="footer">
+    <div th:text="'简历狗 resume-dog　·　由 ' + ${content.basicInfo.name} + ' 的经历碎片生成'">页脚</div>
+</div>
+
+</body>
+</html>

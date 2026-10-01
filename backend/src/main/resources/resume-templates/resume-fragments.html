@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--
+  简历模板公共片段。
+
+  布局约束（重要）：渲染目标是 OpenHTMLtoPDF，它只实现了 CSS 2.1 子集，
+  不支持 flex / grid。所以所有「左右分栏」都用 display:table + table-cell 实现，
+  这是目前 PDF 渲染最稳的做法。改模板时请继续遵守这个约束。
+
+  中文字体走 font-family 回退链：容器里装哪个就用哪个
+  （本地 Windows 有微软雅黑，Docker 镜像里通过 fonts-noto-cjk 提供 Noto Sans CJK SC）。
+-->
+<head>
+    <meta charset="UTF-8"/>
+    <style th:fragment="base">
+        @page {
+            size: A4;
+            margin: 14mm 16mm 16mm 16mm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei",
+                         "PingFang SC", "Hiragino Sans GB", sans-serif;
+            font-size: 10.5pt;
+            line-height: 1.65;
+            color: #1a1a1a;
+        }
+
+        /* ---------- 页眉 ---------- */
+        .header {
+            display: table;
+            width: 100%;
+            border-bottom: 2px solid #1a1a1a;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .header-left {
+            display: table-cell;
+            vertical-align: bottom;
+            width: 45%;
+        }
+
+        .header-right {
+            display: table-cell;
+            vertical-align: bottom;
+            text-align: right;
+        }
+
+        .name {
+            font-size: 22pt;
+            font-weight: bold;
+            letter-spacing: 2px;
+            line-height: 1.2;
+        }
+
+        .target {
+            font-size: 11pt;
+            color: #444;
+            margin-top: 3px;
+        }
+
+        .contact {
+            font-size: 9.5pt;
+            color: #333;
+            line-height: 1.7;
+        }
+
+        /* ---------- 章节 ---------- */
+        .section {
+            margin-bottom: 14px;
+            -pdf-page-break-inside: avoid;
+        }
+
+        .section-title {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-bottom: 7px;
+            padding-bottom: 3px;
+            border-bottom: 1px solid #999;
+        }
+
+        .item {
+            margin-bottom: 10px;
+            -pdf-page-break-inside: avoid;
+        }
+
+        .item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 经历条目标题行：公司/学校在左，职位/时间在右 */
+        .item-head {
+            display: table;
+            width: 100%;
+        }
+
+        .item-head-left {
+            display: table-cell;
+            text-align: left;
+            vertical-align: bottom;
+        }
+
+        .item-head-right {
+            display: table-cell;
+            text-align: right;
+            vertical-align: bottom;
+            white-space: nowrap;
+            font-size: 9.5pt;
+            color: #555;
+        }
+
+        .org {
+            font-weight: bold;
+            font-size: 11pt;
+        }
+
+        .role {
+            font-size: 10pt;
+            color: #333;
+            margin-left: 6px;
+            font-weight: normal;
+        }
+
+        .meta {
+            font-size: 9.5pt;
+            color: #555;
+            margin-top: 1px;
+        }
+
+        ul.highlights {
+            list-style: none;
+            margin-top: 4px;
+        }
+
+        ul.highlights li {
+            /* 用文本前缀做项目符号：PDF 里 list-style 支持不可靠 */
+            padding-left: 12px;
+            text-indent: -12px;
+            margin-bottom: 2px;
+            text-align: justify;
+        }
+
+        ul.highlights li:before {
+            content: "• ";
+            color: #888;
+        }
+
+        /* ---------- 技能 ---------- */
+        .skill-group {
+            margin-bottom: 5px;
+        }
+
+        .skill-label {
+            font-weight: bold;
+        }
+
+        /* ---------- 页脚 ---------- */
+        .footer {
+            display: table;
+            width: 100%;
+            font-size: 8.5pt;
+            color: #999;
+            border-top: 1px solid #ddd;
+            padding-top: 5px;
+        }
+
+        .empty {
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+
+    <!-- 个人摘要 -->
+    <div th:fragment="summary(content)">
+        <p th:text="${content.basicInfo.summary}">个人概述</p>
+    </div>
+
+    <!-- 教育经历 -->
+    <div th:fragment="education(items)">
+        <div class="item" th:each="edu : ${items}">
+            <div class="item-head">
+                <div class="item-head-left">
+                    <span class="org" th:text="${edu.school}">学校</span>
+                    <span class="role" th:text="${edu.major + ' · ' + edu.degree}">专业 · 学历</span>
+                </div>
+                <div class="item-head-right">
+                    <span th:text="${edu.period}">时间</span>
+                    <span th:if="${!#strings.isEmpty(edu.gpa)}" th:text="'　|　' + ${edu.gpa}">GPA</span>
+                </div>
+            </div>
+            <ul class="highlights" th:if="${!#lists.isEmpty(edu.highlights)}">
+                <li th:each="h : ${edu.highlights}" th:text="${h}">要点</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 工作经历 -->
+    <div th:fragment="work(items)">
+        <div class="item" th:each="w : ${items}">
+            <div class="item-head">
+                <div class="item-head-left">
+                    <span class="org" th:text="${w.company}">公司</span>
+                    <span class="role" th:text="${w.position}">职位</span>
+                </div>
+                <div class="item-head-right" th:text="${w.period}">时间</div>
+            </div>
+            <ul class="highlights">
+                <li th:each="h : ${w.highlights}" th:text="${h}">要点</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 项目经历 -->
+    <div th:fragment="projects(items)">
+        <div class="item" th:each="p : ${items}">
+            <div class="item-head">
+                <div class="item-head-left">
+                    <span class="org" th:text="${p.name}">项目</span>
+                    <span class="role" th:text="${p.role}">角色</span>
+                </div>
+                <div class="item-head-right" th:text="${p.period}">时间</div>
+            </div>
+            <div class="meta" th:if="${!#strings.isEmpty(p.techStack)}">
+                <b>技术栈：</b><span th:text="${p.techStack}">技术栈</span>
+            </div>
+            <div class="meta" th:if="${!#strings.isEmpty(p.description)}" th:text="${p.description}">背景</div>
+            <ul class="highlights">
+                <li th:each="h : ${p.highlights}" th:text="${h}">要点</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 技能 -->
+    <div th:fragment="skills(groups)">
+        <div class="skill-group" th:each="g : ${groups}">
+            <span class="skill-label" th:text="${g.category}">分类</span>：
+            <span th:text="${#strings.listJoin(g.items, '、')}">技能</span>
+        </div>
+    </div>
+
+    <!-- 荣誉奖项 -->
+    <div th:fragment="honors(items)">
+        <ul class="highlights">
+            <li th:each="h : ${items}" th:text="${h}">奖项</li>
+        </ul>
+    </div>
+</head>
+<body></body>
+</html>

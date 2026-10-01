@@ -1,0 +1,37 @@
+# 开发用 profile：H2 内存库，不依赖 MySQL / Docker。
+# 启动方式：mvn spring-boot:run -Dspring-boot.run.profiles=dev
+#
+# 为什么不跑 Flyway：V1__init.sql 里有 ENGINE=InnoDB、COLLATE utf8mb4_0900_ai_ci
+# 这些 MySQL 专有语法，H2 的 MySQL 兼容模式也解析不了。
+# 所以 dev 下关掉 Flyway，改用 ddl-auto: update 让 Hibernate 按实体建表。
+# 生产 / 联调环境仍然只认 Flyway（见 application.yml），两条路径不会混用。
+spring:
+  datasource:
+    url: jdbc:h2:mem:resume_dog;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  flyway:
+    enabled: false
+    # H2 Web 控制台：http://localhost:8080/h2-console
+    # JDBC URL 用上面那条，用户名 sa，密码空
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# 本地开发默认走 mock，不烧 API 额度。
+# 想要真实生成效果：改成 false 并在 .env 里配好 ANTHROPIC_API_KEY
+claude:
+  mock: ${CLAUDE_MOCK:true}
+
+jwt:
+  secret: dev-only-secret-not-for-production-use-32bytes-min
